@@ -1,12 +1,14 @@
 package com.example.hms.service.impl;
 
 import com.example.hms.entity.Users;
+import com.example.hms.model.UserManagementDTO;
 import com.example.hms.repository.UserRepo;
 import com.example.hms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,5 +91,19 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<UserManagementDTO> getCustomerManagementList() {
+        List<Users> users = userRepo.fetchCustomerManagementData();
+
+        List<UserManagementDTO> result = new ArrayList<>();
+        for (Users user : users) {
+            UserManagementDTO dto = new UserManagementDTO();
+            dto.setFullName(user.getFirstName() + " " + user.getLastName());
+            dto.setEmail(user.getEmail());
+            result.add(dto);
+        }
+        return result;
     }
 }
