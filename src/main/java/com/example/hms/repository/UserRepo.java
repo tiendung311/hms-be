@@ -13,6 +13,6 @@ public interface UserRepo extends JpaRepository<Users, Integer> {
 
     Users findByEmail(String email);
 
-    @Query(value = "SELECT u FROM Users u WHERE u.role = 'user'")
+    @Query(value = "SELECT u FROM Users u WHERE u.role = 'user' AND u.isDeleted = false")
     List<Users> fetchCustomerManagementData();
 }

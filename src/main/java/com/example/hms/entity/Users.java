@@ -23,6 +23,9 @@ public class Users {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
+    @OneToMany(mappedBy = "customer")
     private List<Bookings> bookings;
 }

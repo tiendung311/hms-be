@@ -15,4 +15,6 @@ public interface UserService {
     void handleClerkWebhook(Map<String, Object> payload);
 
     List<UserManagementDTO> getCustomerManagementList();
+
+    void deleteUserByEmail(String email);
 }

@@ -17,7 +17,6 @@ public class Payments {
     private Bookings booking;
 
     private Double amount;
-//    private String paymentType;
     private String paymentMethod;
     private String paymentStatus;
 

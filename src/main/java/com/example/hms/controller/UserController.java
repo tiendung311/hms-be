@@ -24,4 +24,10 @@ public class UserController {
     public ResponseEntity<List<UserManagementDTO>> getCustomerManagementList() {
         return ResponseEntity.ok(userService.getCustomerManagementList());
     }
+
+    @DeleteMapping("/admin/customers/{email}")
+    public ResponseEntity<Void> deleteUserByEmail(@PathVariable String email) {
+        userService.deleteUserByEmail(email);
+        return ResponseEntity.noContent().build();
+    }
 }

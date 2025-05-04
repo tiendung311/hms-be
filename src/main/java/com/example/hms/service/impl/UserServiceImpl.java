@@ -4,6 +4,7 @@ import com.example.hms.entity.Users;
 import com.example.hms.model.UserManagementDTO;
 import com.example.hms.repository.UserRepo;
 import com.example.hms.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -105,5 +106,15 @@ public class UserServiceImpl implements UserService {
             result.add(dto);
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserByEmail(String email) {
+        Users user = userRepo.findByEmail(email);
+        if (user != null) {
+            user.setDeleted(true);
+            userRepo.save(user);
+        }
     }
 }
