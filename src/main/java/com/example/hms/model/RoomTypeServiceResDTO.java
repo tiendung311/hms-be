@@ -9,9 +9,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceManagementDTO {
-    private Integer serviceId;
+public class RoomTypeServiceResDTO {
+    // Send this DTO to the client
     private String roomType;
     private List<String> services;
-    private List<String> rooms;
 }

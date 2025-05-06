@@ -9,9 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceManagementDTO {
-    private Integer serviceId;
-    private String roomType;
+public class RoomTypeServiceReqDTO {
+    // This DTO used for updating the room type services
     private List<String> services;
-    private List<String> rooms;
 }
