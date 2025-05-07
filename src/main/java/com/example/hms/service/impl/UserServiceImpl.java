@@ -114,6 +114,7 @@ public class UserServiceImpl implements UserService {
         Users user = userRepo.findByEmail(email);
         if (user != null) {
             user.setDeleted(true);
+            user.setUpdatedAt(LocalDateTime.now());
             userRepo.save(user);
         }
     }

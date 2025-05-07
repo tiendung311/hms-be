@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,10 @@ public class RoomServiceImpl implements RoomService {
 
         if ("Trống".equalsIgnoreCase(currentStatus)) {
             room.setRoomStatus("Bảo trì");
+            room.setUpdatedAt(LocalDateTime.now());
         } else if ("Bảo trì".equalsIgnoreCase(currentStatus)) {
             room.setRoomStatus("Trống");
+            room.setUpdatedAt(LocalDateTime.now());
         } else {
             throw new IllegalStateException("Cannot toggle status while the current status: " + currentStatus);
         }
