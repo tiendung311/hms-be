@@ -10,4 +10,6 @@ public interface RoomService {
     List<RoomManagementDTO> getRoomManagementList();
 
     void toggleRoomMaintenance(String roomNumber);
+
+    List<String> getAllEmptyRoom();
 }

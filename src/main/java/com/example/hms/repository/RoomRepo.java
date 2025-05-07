@@ -29,4 +29,7 @@ public interface RoomRepo extends JpaRepository<Rooms, Integer> {
     List<Object[]> fetchRoomManagementData();
 
     Optional<Rooms> findByRoomNumber(String roomNumber);
+
+    @Query("SELECT r.roomNumber FROM Rooms r WHERE r.roomStatus = 'Trống'")
+    List<String> getAllEmptyRoom();
 }

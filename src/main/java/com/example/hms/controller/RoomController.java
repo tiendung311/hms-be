@@ -35,4 +35,9 @@ public class RoomController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/admin/rooms/empty")
+    public List<String> getAllEmptyRoom() {
+        return roomService.getAllEmptyRoom();
+    }
 }

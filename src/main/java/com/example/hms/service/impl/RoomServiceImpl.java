@@ -57,4 +57,9 @@ public class RoomServiceImpl implements RoomService {
         }
         roomRepo.save(room);
     }
+
+    @Override
+    public List<String> getAllEmptyRoom() {
+        return roomRepo.getAllEmptyRoom();
+    }
 }
