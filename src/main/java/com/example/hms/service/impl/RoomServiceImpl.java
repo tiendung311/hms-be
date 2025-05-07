@@ -1,8 +1,10 @@
 package com.example.hms.service.impl;
 
+import com.example.hms.entity.Rooms;
 import com.example.hms.model.RoomManagementDTO;
 import com.example.hms.repository.RoomRepo;
 import com.example.hms.service.RoomService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +35,23 @@ public class RoomServiceImpl implements RoomService {
             result.add(new RoomManagementDTO(roomNumber, roomType, roomServices, roomStatus));
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void toggleRoomMaintenance(String roomNumber) {
+        Rooms room = roomRepo.findByRoomNumber(roomNumber)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        String currentStatus = room.getRoomStatus();
+
+        if ("Trống".equalsIgnoreCase(currentStatus)) {
+            room.setRoomStatus("Bảo trì");
+        } else if ("Bảo trì".equalsIgnoreCase(currentStatus)) {
+            room.setRoomStatus("Trống");
+        } else {
+            throw new IllegalStateException("Cannot toggle status while the current status: " + currentStatus);
+        }
+        roomRepo.save(room);
     }
 }

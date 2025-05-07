@@ -8,4 +8,6 @@ public interface RoomService {
     List<String> getAllRoomStatuses();
 
     List<RoomManagementDTO> getRoomManagementList();
+
+    void toggleRoomMaintenance(String roomNumber);
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoomRepo extends JpaRepository<Rooms, Integer> {
@@ -26,4 +27,6 @@ public interface RoomRepo extends JpaRepository<Rooms, Integer> {
     ORDER BY r.id
     """, nativeQuery = true)
     List<Object[]> fetchRoomManagementData();
+
+    Optional<Rooms> findByRoomNumber(String roomNumber);
 }

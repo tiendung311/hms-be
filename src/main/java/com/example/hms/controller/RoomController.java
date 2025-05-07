@@ -4,9 +4,7 @@ import com.example.hms.model.RoomManagementDTO;
 import com.example.hms.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,5 +22,17 @@ public class RoomController {
     @GetMapping("/admin/rooms")
     public ResponseEntity<List<RoomManagementDTO>> getRoomManagementList() {
         return ResponseEntity.ok(roomService.getRoomManagementList());
+    }
+
+    @PutMapping("/admin/rooms/{roomNumber}/toggle-maintenance")
+    public ResponseEntity<String> toggleRoomMaintenance(@PathVariable String roomNumber) {
+        try {
+            roomService.toggleRoomMaintenance(roomNumber);
+            return ResponseEntity.ok("Toggle status successfully.");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
