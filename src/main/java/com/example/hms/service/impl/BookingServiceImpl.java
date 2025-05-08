@@ -1,6 +1,7 @@
 package com.example.hms.service.impl;
 
 import com.example.hms.entity.Bookings;
+import com.example.hms.entity.RoomTypes;
 import com.example.hms.entity.Rooms;
 import com.example.hms.model.BookingManagementDTO;
 import com.example.hms.model.BookingReqDTO;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -125,5 +127,29 @@ public class BookingServiceImpl implements BookingService {
         booking.setTotalAmount(reqDTO.getTotalPrice());
 
         bookingRepo.save(booking);
+    }
+
+    @Override
+    public double calculateTotalAmount(String roomNumber, String checkInDateStr, String checkOutDateStr) {
+        // Parse day
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate checkInDate = LocalDate.parse(checkInDateStr, formatter);
+        LocalDate checkOutDate = LocalDate.parse(checkOutDateStr, formatter);
+
+        // Calculate number of nights
+        long nights = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+        if (nights <= 0) {
+            throw new IllegalArgumentException("Check-out date must be after check-in date.");
+        }
+
+        // Find room by room number
+        Rooms room = roomRepo.findByRoomNumber(roomNumber)
+                .orElseThrow(() -> new RuntimeException("Room not found with number: " + roomNumber));
+
+        // Get room type and price
+        RoomTypes roomType = room.getRoomType();
+        double pricePerNight = roomType.getPricePerNight();
+
+        return pricePerNight * nights;
     }
 }

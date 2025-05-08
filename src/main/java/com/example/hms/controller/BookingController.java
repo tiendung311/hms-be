@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -36,5 +37,13 @@ public class BookingController {
                                            @RequestBody BookingReqDTO bookingReqDTO) {
         bookingService.updateBookingDetail(bookingId, bookingReqDTO);
         return ResponseEntity.ok("Booking updated successfully");
+    }
+
+    @GetMapping("/admin/bookings/calculate-price")
+    public ResponseEntity<?> calculateTotalAmount(@RequestParam String roomNumber,
+                                                  @RequestParam String checkInDate,
+                                                  @RequestParam String checkOutDate) {
+        double total = bookingService.calculateTotalAmount(roomNumber, checkInDate, checkOutDate);
+        return ResponseEntity.ok(Collections.singletonMap("totalAmount", total));
     }
 }

@@ -14,4 +14,6 @@ public interface BookingService {
     BookingResDTO getBookingDetailById(int id);
 
     void updateBookingDetail(int bookingId, BookingReqDTO reqDTO);
+
+    double calculateTotalAmount(String roomNumber, String checkInDateStr, String checkOutDateStr);
 }
