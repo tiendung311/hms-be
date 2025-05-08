@@ -33,7 +33,6 @@ public interface BookingRepo extends JpaRepository<Bookings, Integer> {
         b.id,
         CONCAT(u.first_name, ' ', u.last_name) AS full_name,
         r.room_number,
-        CONCAT(rt.type, ' ', rt.star, ' sao') AS room_type,
         b.check_in_date,
         b.check_out_date,
         b.status,

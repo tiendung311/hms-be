@@ -1,14 +1,12 @@
 package com.example.hms.controller;
 
 import com.example.hms.model.BookingManagementDTO;
+import com.example.hms.model.BookingReqDTO;
 import com.example.hms.model.BookingResDTO;
 import com.example.hms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,12 @@ public class BookingController {
     @GetMapping("/admin/bookings/{bookingId}")
     public ResponseEntity<?> getBookingDetail(@PathVariable int bookingId) {
         return ResponseEntity.ok(bookingService.getBookingDetailById(bookingId));
+    }
+
+    @PutMapping("/admin/bookings/{bookingId}")
+    public ResponseEntity<?> updateBooking(@PathVariable int bookingId,
+                                           @RequestBody BookingReqDTO bookingReqDTO) {
+        bookingService.updateBookingDetail(bookingId, bookingReqDTO);
+        return ResponseEntity.ok("Booking updated successfully");
     }
 }
