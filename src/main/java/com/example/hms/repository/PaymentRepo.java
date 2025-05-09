@@ -3,9 +3,11 @@ package com.example.hms.repository;
 import com.example.hms.entity.Payments;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PaymentRepo extends JpaRepository<Payments, Integer> {
@@ -17,6 +19,7 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
 
     @Query(value = """
     SELECT 
+        p.id AS transaction_id,
         CONCAT(u.first_name, ' ', u.last_name) AS full_name,
         r.room_number,
         p.created_at AS payment_date,
@@ -30,4 +33,23 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
     ORDER BY p.created_at DESC
     """, nativeQuery = true)
     List<Object[]> fetchPaymentManagementData();
+
+    @Query(value = """
+    SELECT 
+        p.id AS transaction_id,
+        CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+        r.room_number,
+        p.created_at AS payment_date,
+        p.payment_method,
+        p.payment_status,
+        p.amount
+    FROM payments p
+    JOIN bookings b ON p.booking_id = b.id
+    JOIN users u ON b.customer_id = u.id
+    JOIN rooms r ON b.room_id = r.id
+    WHERE p.id = :transactionId
+    """, nativeQuery = true)
+    Object fetchPaymentDetailById(@Param("transactionId") Integer transactionId);
+
+    Optional<Payments> findById(Integer id);
 }

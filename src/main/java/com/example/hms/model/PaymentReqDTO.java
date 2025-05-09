@@ -7,13 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentManagementDTO {
-    private Integer transactionId;
-    // full name of the customer
-    private String fullName;
-    private String roomNumber;
-    private String paymentDate;
+public class PaymentReqDTO {
+    // This dto used to update the payment details
     private String paymentMethod;
     private String paymentStatus;
-    private Double amount;
 }
