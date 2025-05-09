@@ -22,7 +22,7 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
         p.id AS transaction_id,
         CONCAT(u.first_name, ' ', u.last_name) AS full_name,
         r.room_number,
-        p.created_at AS payment_date,
+        p.payment_date,
         p.payment_method,
         p.payment_status,
         p.amount
@@ -39,7 +39,7 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
         p.id AS transaction_id,
         CONCAT(u.first_name, ' ', u.last_name) AS full_name,
         r.room_number,
-        p.created_at AS payment_date,
+        p.payment_date,
         p.payment_method,
         p.payment_status,
         p.amount

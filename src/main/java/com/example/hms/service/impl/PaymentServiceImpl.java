@@ -42,12 +42,18 @@ public class PaymentServiceImpl implements PaymentService {
             Integer transactionId = (Integer) row[0];
             String fullName = (String) row[1];
             String roomNumber = (String) row[2];
-            LocalDateTime paymentDateTime = ((Timestamp) row[3]).toLocalDateTime();
+            Timestamp paymentTimestamp = (Timestamp) row[3];
             String paymentMethod = (String) row[4];
             String paymentStatus = (String) row[5];
             Double amount = (Double) row[6];
 
-            String formattedPaymentDate = paymentDateTime.format(formatter);
+            String formattedPaymentDate;
+            if (paymentTimestamp != null) {
+                LocalDateTime paymentDateTime = paymentTimestamp.toLocalDateTime();
+                formattedPaymentDate = paymentDateTime.format(formatter);
+            } else {
+                formattedPaymentDate = "Chưa thanh toán";
+            }
 
             PaymentManagementDTO dto = new PaymentManagementDTO();
             dto.setTransactionId(transactionId);
@@ -73,8 +79,16 @@ public class PaymentServiceImpl implements PaymentService {
         Object[] row = (Object[]) res;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
-        LocalDateTime paymentDateTime = ((Timestamp) row[3]).toLocalDateTime();
-        String formattedDate = paymentDateTime.format(formatter);
+
+        String formattedDate = null;
+        if (row[3] != null) {
+            LocalDateTime paymentDateTime = ((Timestamp) row[3]).toLocalDateTime();
+            formattedDate = paymentDateTime.format(formatter);
+        } else {
+            formattedDate = "Chưa thanh toán";
+        }
+
+        Double amount = row[6] != null ? (Double) row[6] : 0.0;
 
         return new PaymentResDTO(
                 (Integer) row[0],
@@ -83,7 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
                 formattedDate,
                 (String) row[4],
                 (String) row[5],
-                (Double) row[6]
+                amount
         );
     }
 
