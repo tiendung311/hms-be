@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,5 +73,10 @@ public class RoomServiceImpl implements RoomService {
             return roomType.getType() + " " + roomType.getStar() + " sao";
         }
         return null;
+    }
+
+    @Override
+    public List<String> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
+        return roomRepo.findAvailableRoomNumbers(checkInDate, checkOutDate);
     }
 }

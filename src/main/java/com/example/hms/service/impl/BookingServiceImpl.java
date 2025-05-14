@@ -123,8 +123,12 @@ public class BookingServiceImpl implements BookingService {
         String bookingStatus = reqDTO.getBookingStatus();
         if ("Hủy".equalsIgnoreCase(bookingStatus) || "Trả phòng".equalsIgnoreCase(bookingStatus)) {
             room.setRoomStatus("Trống");
+        } else if ("Nhận phòng".equalsIgnoreCase(bookingStatus)) {
+            room.setRoomStatus("Đang sử dụng");
+        } else if ("Xác nhận".equalsIgnoreCase(bookingStatus)) {
+            room.setRoomStatus("Đã xác nhận");
         } else {
-            room.setRoomStatus("Đã đặt");
+            room.setRoomStatus("Chờ");
         }
         roomRepo.save(room);
 
@@ -182,8 +186,8 @@ public class BookingServiceImpl implements BookingService {
         Rooms room = roomRepo.findByRoomNumber(roomNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng này."));
 
-        room.setRoomStatus("Đã đặt");
-        roomRepo.save(room);
+//        room.setRoomStatus("Đang sử dụng");
+//        roomRepo.save(room);
 
         Users customer = userRepo.findByEmail(email);
 

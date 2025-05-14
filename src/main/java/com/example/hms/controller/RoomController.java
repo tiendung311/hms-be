@@ -3,10 +3,12 @@ package com.example.hms.controller;
 import com.example.hms.model.RoomManagementDTO;
 import com.example.hms.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,5 +57,13 @@ public class RoomController {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Không tìm thấy phòng"));
+    }
+
+    @GetMapping("/admin/rooms/available")
+    public List<String> getAvailableRooms(@RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                              LocalDate checkInDate,
+                                          @RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                          LocalDate checkOutDate) {
+        return roomService.getAvailableRooms(checkInDate, checkOutDate);
     }
 }

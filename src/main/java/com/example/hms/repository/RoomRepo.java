@@ -3,8 +3,10 @@ package com.example.hms.repository;
 import com.example.hms.entity.Rooms;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +34,15 @@ public interface RoomRepo extends JpaRepository<Rooms, Integer> {
 
     @Query("SELECT r.roomNumber FROM Rooms r WHERE r.roomStatus = 'Trống'")
     List<String> getAllEmptyRoom();
+
+    @Query("""
+    SELECT r.roomNumber FROM Rooms r
+    WHERE r.id NOT IN (
+        SELECT b.room.id FROM Bookings b
+        WHERE b.status IN ('Chờ', 'Xác nhận', 'Nhận phòng')
+        AND b.checkInDate < :checkOutDate AND b.checkOutDate > :checkInDate
+        )
+    """)
+    List<String> findAvailableRoomNumbers(@Param("checkInDate") LocalDate checkInDate,
+                                          @Param("checkOutDate") LocalDate checkOutDate);
 }

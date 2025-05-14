@@ -53,4 +53,6 @@ public interface BookingRepo extends JpaRepository<Bookings, Integer> {
     List<Bookings> findBookingsByEmailAndDateRange(@Param("email") String email,
                                                    @Param("checkInDate") LocalDate checkInDate,
                                                    @Param("checkOutDate") LocalDate checkOutDate);
+
+    List<Bookings> findAllByCheckInDateLessThanEqualAndCheckOutDateGreaterThanEqual(LocalDate checkOut, LocalDate checkIn);
 }
