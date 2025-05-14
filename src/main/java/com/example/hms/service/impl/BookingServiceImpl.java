@@ -1,14 +1,12 @@
 package com.example.hms.service.impl;
 
-import com.example.hms.entity.Bookings;
-import com.example.hms.entity.RoomTypes;
-import com.example.hms.entity.Rooms;
-import com.example.hms.entity.Users;
+import com.example.hms.entity.*;
 import com.example.hms.model.BookingCreateDTO;
 import com.example.hms.model.BookingManagementDTO;
 import com.example.hms.model.BookingReqDTO;
 import com.example.hms.model.BookingResDTO;
 import com.example.hms.repository.BookingRepo;
+import com.example.hms.repository.PaymentRepo;
 import com.example.hms.repository.RoomRepo;
 import com.example.hms.repository.UserRepo;
 import com.example.hms.service.BookingService;
@@ -36,6 +34,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private PaymentRepo paymentRepo;
 
     @Override
     public List<String> getAllBookingStatuses() {
@@ -186,9 +187,6 @@ public class BookingServiceImpl implements BookingService {
         Rooms room = roomRepo.findByRoomNumber(roomNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng này."));
 
-//        room.setRoomStatus("Đang sử dụng");
-//        roomRepo.save(room);
-
         Users customer = userRepo.findByEmail(email);
 
         Bookings booking = new Bookings();
@@ -202,5 +200,15 @@ public class BookingServiceImpl implements BookingService {
         booking.setUpdatedAt(LocalDateTime.now());
 
         bookingRepo.save(booking);
+
+        Payments payment = new Payments();
+        payment.setBooking(booking);
+        payment.setPaymentStatus("Chờ");
+        payment.setAmount(null);
+        payment.setPaymentMethod(null);
+        payment.setPaymentDate(null);
+        payment.setCreatedAt(LocalDateTime.now());
+
+        paymentRepo.save(payment);
     }
 }

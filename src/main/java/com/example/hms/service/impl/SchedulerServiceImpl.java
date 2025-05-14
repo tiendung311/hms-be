@@ -24,11 +24,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final RoomRepo roomRepo;
 
     // Chạy mỗi phút (test)
-    @Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 * * * * *")
     // Tùy chọn thay thế để chạy mỗi 30 phút:
     // @Scheduled(cron = "0 */30 * * * *")
     // Hoặc mỗi giờ:
-    // @Scheduled(cron = "0 0 * * * *")
+     @Scheduled(cron = "0 0 * * * *")
     @Override
     public void updateRoomStatuses() {
         LocalDate today = LocalDate.now();
