@@ -17,4 +17,6 @@ public interface UserService {
     List<UserManagementDTO> getCustomerManagementList();
 
     void deleteUserByEmail(String email);
+
+    Users getCustomerByEmail(String email);
 }

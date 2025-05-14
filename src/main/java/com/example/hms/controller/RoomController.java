@@ -3,10 +3,14 @@ package com.example.hms.controller;
 import com.example.hms.model.RoomManagementDTO;
 import com.example.hms.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -39,5 +43,17 @@ public class RoomController {
     @GetMapping("/admin/rooms/empty")
     public List<String> getAllEmptyRoom() {
         return roomService.getAllEmptyRoom();
+    }
+
+    // api to get room type by room number
+    @GetMapping("/admin/rooms/{roomNumber}")
+    public ResponseEntity<Map<String, String>> getRoomTypeByRoomNumber(@PathVariable String roomNumber) {
+        String roomType = roomService.getRoomTypeByRoomNumber(roomNumber);
+        if (roomType != null) {
+            Map<String, String> response = new HashMap<>();
+            response.put("roomType", roomType);
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Không tìm thấy phòng"));
     }
 }

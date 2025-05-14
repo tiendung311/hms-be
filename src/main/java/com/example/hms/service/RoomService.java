@@ -12,4 +12,6 @@ public interface RoomService {
     void toggleRoomMaintenance(String roomNumber);
 
     List<String> getAllEmptyRoom();
+
+    String getRoomTypeByRoomNumber(String roomNumber);
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -44,4 +45,12 @@ public interface BookingRepo extends JpaRepository<Bookings, Integer> {
     WHERE b.id = :bookingId
     """, nativeQuery = true)
     Object fetchBookingDetailById(@Param("bookingId") int bookingId);
+
+    @Query("SELECT b FROM Bookings b WHERE b.customer.email = :email " +
+            "AND ((b.checkInDate BETWEEN :checkInDate AND :checkOutDate) " +
+            "OR (b.checkOutDate BETWEEN :checkInDate AND :checkOutDate)) " +
+            "AND b.status IN ('Chờ', 'Xác nhận', 'Nhận phòng')")
+    List<Bookings> findBookingsByEmailAndDateRange(@Param("email") String email,
+                                                   @Param("checkInDate") LocalDate checkInDate,
+                                                   @Param("checkOutDate") LocalDate checkOutDate);
 }

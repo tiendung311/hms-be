@@ -3,6 +3,7 @@ package com.example.hms.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,8 +21,8 @@ public class Bookings {
     @JoinColumn(name = "room_id", nullable = false)
     private Rooms room;
 
-    private LocalDateTime checkInDate;
-    private LocalDateTime checkOutDate;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
 
     private Double totalAmount;
 

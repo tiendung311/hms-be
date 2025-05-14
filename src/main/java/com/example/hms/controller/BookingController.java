@@ -1,15 +1,18 @@
 package com.example.hms.controller;
 
+import com.example.hms.model.BookingCreateDTO;
 import com.example.hms.model.BookingManagementDTO;
 import com.example.hms.model.BookingReqDTO;
 import com.example.hms.model.BookingResDTO;
 import com.example.hms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -45,5 +48,21 @@ public class BookingController {
                                                   @RequestParam String checkOutDate) {
         double total = bookingService.calculateTotalAmount(roomNumber, checkInDate, checkOutDate);
         return ResponseEntity.ok(Collections.singletonMap("totalAmount", total));
+    }
+
+    @PostMapping("/admin/bookings")
+    public ResponseEntity<?> createBooking(@RequestBody BookingCreateDTO bookingCreateDTO) {
+        try {
+            bookingService.createBooking(bookingCreateDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Tạo booking thành công!");
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tạo booking");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.hms.service.impl;
 
+import com.example.hms.entity.RoomTypes;
 import com.example.hms.entity.Rooms;
 import com.example.hms.model.RoomManagementDTO;
 import com.example.hms.repository.RoomRepo;
@@ -61,5 +62,15 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<String> getAllEmptyRoom() {
         return roomRepo.getAllEmptyRoom();
+    }
+
+    @Override
+    public String getRoomTypeByRoomNumber(String roomNumber) {
+        Rooms room = roomRepo.findByRoomNumber(roomNumber).orElseThrow(() -> new RuntimeException("Room not found"));
+        if (room != null) {
+            RoomTypes roomType = room.getRoomType();
+            return roomType.getType() + " " + roomType.getStar() + " sao";
+        }
+        return null;
     }
 }

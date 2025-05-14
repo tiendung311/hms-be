@@ -3,17 +3,22 @@ package com.example.hms.service.impl;
 import com.example.hms.entity.Bookings;
 import com.example.hms.entity.RoomTypes;
 import com.example.hms.entity.Rooms;
+import com.example.hms.entity.Users;
+import com.example.hms.model.BookingCreateDTO;
 import com.example.hms.model.BookingManagementDTO;
 import com.example.hms.model.BookingReqDTO;
 import com.example.hms.model.BookingResDTO;
 import com.example.hms.repository.BookingRepo;
 import com.example.hms.repository.RoomRepo;
+import com.example.hms.repository.UserRepo;
 import com.example.hms.service.BookingService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +33,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private RoomRepo roomRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Override
     public List<String> getAllBookingStatuses() {
@@ -45,8 +53,8 @@ public class BookingServiceImpl implements BookingService {
             Integer bookingId = (Integer) row[0];
             String fullName = (String) row[1];
             String roomNumber = (String) row[2];
-            LocalDate checkInDate = ((Timestamp) row[3]).toLocalDateTime().toLocalDate();
-            LocalDate checkOutDate = ((Timestamp) row[4]).toLocalDateTime().toLocalDate();
+            LocalDate checkInDate = ((Date) row[3]).toLocalDate();
+            LocalDate checkOutDate = ((Date) row[4]).toLocalDate();
             String status = (String) row[5];
 
             String formattedCheckInDate = checkInDate.format(formatter);
@@ -70,8 +78,8 @@ public class BookingServiceImpl implements BookingService {
         Integer bookingId = (Integer) row[0];
         String fullName = (String) row[1];
         String roomNumber = (String) row[2];
-        LocalDate checkIn = ((Timestamp) row[3]).toLocalDateTime().toLocalDate();
-        LocalDate checkOut = ((Timestamp) row[4]).toLocalDateTime().toLocalDate();
+        LocalDate checkIn = ((Date) row[3]).toLocalDate();
+        LocalDate checkOut = ((Date) row[4]).toLocalDate();
         String status = (String) row[5];
         double totalPrice = ((Number) row[6]).doubleValue();
 
@@ -121,8 +129,8 @@ public class BookingServiceImpl implements BookingService {
         roomRepo.save(room);
 
         booking.setRoom(room);
-        booking.setCheckInDate(checkInDate.atStartOfDay());
-        booking.setCheckOutDate(checkOutDate.atStartOfDay());
+        booking.setCheckInDate(checkInDate);
+        booking.setCheckOutDate(checkOutDate);
         booking.setStatus(reqDTO.getBookingStatus());
         booking.setTotalAmount(reqDTO.getTotalPrice());
 
@@ -151,5 +159,44 @@ public class BookingServiceImpl implements BookingService {
         double pricePerNight = roomType.getPricePerNight();
 
         return pricePerNight * nights;
+    }
+
+    // Check if the room is booked
+    private boolean isRoomBooked(String email, LocalDate checkInDate, LocalDate checkOutDate) {
+        List<Bookings> bookings = bookingRepo.findBookingsByEmailAndDateRange(email, checkInDate, checkOutDate);
+        return !bookings.isEmpty();
+    }
+
+    @Override
+    public void createBooking(BookingCreateDTO bookingCreateDTO) {
+        String email = bookingCreateDTO.getEmail();
+        String roomNumber = bookingCreateDTO.getRoomNumber();
+        LocalDate checkInDate = LocalDate.parse(bookingCreateDTO.getCheckInDate());
+        LocalDate checkOutDate = LocalDate.parse(bookingCreateDTO.getCheckOutDate());
+
+        // Check if the room is already booked
+        if (isRoomBooked(email, checkInDate, checkOutDate)) {
+            throw new IllegalStateException("Khách hàng đang có booking trong thời gian này.");
+        }
+
+        Rooms room = roomRepo.findByRoomNumber(roomNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phòng này."));
+
+        room.setRoomStatus("Đã đặt");
+        roomRepo.save(room);
+
+        Users customer = userRepo.findByEmail(email);
+
+        Bookings booking = new Bookings();
+        booking.setCustomer(customer);
+        booking.setRoom(room);
+        booking.setCheckInDate(checkInDate);
+        booking.setCheckOutDate(checkOutDate);
+        booking.setTotalAmount(bookingCreateDTO.getTotalAmount());
+        booking.setStatus("Chờ");
+        booking.setCreatedAt(LocalDateTime.now());
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        bookingRepo.save(booking);
     }
 }

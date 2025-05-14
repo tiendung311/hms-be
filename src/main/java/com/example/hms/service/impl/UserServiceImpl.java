@@ -46,7 +46,6 @@ public class UserServiceImpl implements UserService {
         userRepo.save(user);
     }
 
-
     @Override
     public void handleClerkWebhook(Map<String, Object> payload) {
         String eventType = (String) payload.get("type");
@@ -117,5 +116,10 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedAt(LocalDateTime.now());
             userRepo.save(user);
         }
+    }
+
+    @Override
+    public Users getCustomerByEmail(String email) {
+        return userRepo.findByEmail(email);
     }
 }
