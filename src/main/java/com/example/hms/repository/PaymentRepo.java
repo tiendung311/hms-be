@@ -1,5 +1,6 @@
 package com.example.hms.repository;
 
+import com.example.hms.entity.Bookings;
 import com.example.hms.entity.Payments;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -57,4 +58,6 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
     Integer findBookingIdByTransactionId(@Param("transactionId") Integer transactionId);
 
     Optional<Payments> findFirstByBooking_IdAndPaymentStatus(Integer bookingId, String status);
+
+    Optional<Payments> findByOrderCode(Long orderCode);
 }

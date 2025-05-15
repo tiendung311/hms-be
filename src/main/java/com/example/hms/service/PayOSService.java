@@ -44,7 +44,7 @@ public class PayOSService {
         );
 
         ItemData item = ItemData.builder()
-                .name("Tên sản phẩm")
+                .name("Đơn đặt phòng")
                 .quantity(1)
                 .price(booking.getTotalAmount().intValue())
                 .build();
@@ -67,12 +67,14 @@ public class PayOSService {
             if (existingPaymentOpt.isPresent()) {
                 payment = existingPaymentOpt.get();
                 payment.setCreatedAt(LocalDateTime.now());
+                payment.setOrderCode(orderCode);
             } else {
                 payment = new Payments();
                 payment.setBooking(booking);
                 payment.setAmount((double) paymentData.getAmount());
                 payment.setPaymentMethod("Chuyển khoản");
                 payment.setPaymentStatus("Chờ");
+                payment.setOrderCode(orderCode);
                 payment.setCreatedAt(LocalDateTime.now());
             }
 

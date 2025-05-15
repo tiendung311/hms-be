@@ -22,4 +22,7 @@ public class Payments {
     private LocalDateTime paymentDate;
 
     private LocalDateTime createdAt;
+
+    @Column(name = "order_code", unique = true)
+    private Long orderCode;
 }
