@@ -16,4 +16,6 @@ public interface PaymentService {
     PaymentResDTO getPaymentDetailById(int id);
 
     void updatePaymentDetail(int transactionId, PaymentReqDTO dto);
+
+    Integer getBookingIdByTransactionId(Integer transactionId);
 }

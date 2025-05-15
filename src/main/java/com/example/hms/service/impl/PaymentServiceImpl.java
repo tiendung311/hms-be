@@ -112,4 +112,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         paymentRepo.save(payments);
     }
+
+    @Override
+    public Integer getBookingIdByTransactionId(Integer transactionId) {
+        return paymentRepo.findBookingIdByTransactionId(transactionId);
+    }
 }

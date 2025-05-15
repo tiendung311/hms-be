@@ -52,4 +52,9 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
     Object fetchPaymentDetailById(@Param("transactionId") Integer transactionId);
 
     Optional<Payments> findById(Integer id);
+
+    @Query(value = "SELECT booking_id FROM payments WHERE id = :transactionId", nativeQuery = true)
+    Integer findBookingIdByTransactionId(@Param("transactionId") Integer transactionId);
+
+    Optional<Payments> findFirstByBooking_IdAndPaymentStatus(Integer bookingId, String status);
 }

@@ -3,6 +3,7 @@ package com.example.hms.controller;
 import com.example.hms.model.PaymentManagementDTO;
 import com.example.hms.model.PaymentReqDTO;
 import com.example.hms.model.PaymentResDTO;
+import com.example.hms.service.PayOSService;
 import com.example.hms.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,9 @@ import java.util.List;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private PayOSService payOSService;
 
     @GetMapping("/payments/status")
     public List<String> getAllPaymentStatuses() {
@@ -42,5 +46,19 @@ public class PaymentController {
                                                     @RequestBody PaymentReqDTO dto) {
         paymentService.updatePaymentDetail(transactionId, dto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/payments/create-link")
+    public ResponseEntity<?> createPaymentLink(@RequestParam("transactionId") Integer transactionId) {
+        try {
+            Integer bookingId = paymentService.getBookingIdByTransactionId(transactionId);
+            if (bookingId == null) {
+                throw new RuntimeException("Không tìm thấy bookingId từ transactionId: " + transactionId);
+            }
+            var response = payOSService.createPaymentLink(bookingId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body("Tạo liên kết thanh toán thất bại: " + e.getMessage());
+        }
     }
 }
