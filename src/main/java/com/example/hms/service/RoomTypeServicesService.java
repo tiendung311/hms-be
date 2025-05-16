@@ -1,5 +1,6 @@
 package com.example.hms.service;
 
+import com.example.hms.model.RoomCardDTO;
 import com.example.hms.model.RoomTypeServiceReqDTO;
 import com.example.hms.model.RoomTypeServiceResDTO;
 import com.example.hms.model.ServiceManagementDTO;
@@ -12,4 +13,6 @@ public interface RoomTypeServicesService {
     RoomTypeServiceResDTO getRoomTypeServicesById(Integer roomTypeId);
 
     void updateRoomTypeServices(Integer roomTypeId, RoomTypeServiceReqDTO roomTypeServiceReqDTO);
+
+    List<RoomCardDTO> getRoomCardList();
 }

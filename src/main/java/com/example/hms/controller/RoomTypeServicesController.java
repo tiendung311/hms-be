@@ -1,5 +1,6 @@
 package com.example.hms.controller;
 
+import com.example.hms.model.RoomCardDTO;
 import com.example.hms.model.RoomTypeServiceReqDTO;
 import com.example.hms.model.RoomTypeServiceResDTO;
 import com.example.hms.model.ServiceManagementDTO;
@@ -44,5 +45,10 @@ public class RoomTypeServicesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi cập nhật: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/room-cards")
+    public ResponseEntity<List<RoomCardDTO>> getRoomCards() {
+        return ResponseEntity.ok(roomTypeServicesService.getRoomCardList());
     }
 }

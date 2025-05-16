@@ -44,4 +44,18 @@ public interface RoomTypeServicesRepo extends JpaRepository<RoomTypeServices, In
     @Transactional
     @Query("DELETE FROM RoomTypeServices rts WHERE rts.roomType = :roomType")
     void deleteByRoomType(@Param("roomType") RoomTypes roomType);
+
+    @Query(value = """
+    SELECT 
+        rt.type,
+        rt.star,
+        rt.price_per_night,
+        GROUP_CONCAT(DISTINCT s.service_name ORDER BY s.service_name SEPARATOR ', ') AS service_names
+    FROM room_types rt
+    LEFT JOIN room_type_services rts ON rt.id = rts.room_type_id
+    LEFT JOIN services s ON rts.service_id = s.id
+    GROUP BY rt.id, rt.type, rt.star, rt.price_per_night
+    ORDER BY rt.id
+    """, nativeQuery = true)
+    List<Object[]> fetchRoomCardData();
 }

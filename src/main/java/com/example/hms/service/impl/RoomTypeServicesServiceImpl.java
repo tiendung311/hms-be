@@ -3,6 +3,7 @@ package com.example.hms.service.impl;
 import com.example.hms.entity.RoomTypeServices;
 import com.example.hms.entity.RoomTypes;
 import com.example.hms.entity.Services;
+import com.example.hms.model.RoomCardDTO;
 import com.example.hms.model.RoomTypeServiceReqDTO;
 import com.example.hms.model.RoomTypeServiceResDTO;
 import com.example.hms.model.ServiceManagementDTO;
@@ -85,5 +86,26 @@ public class RoomTypeServicesServiceImpl implements RoomTypeServicesService {
                 roomTypeServicesRepo.save(rts);
             }
         }
+    }
+
+    @Override
+    public List<RoomCardDTO> getRoomCardList() {
+        List<Object[]> rawData = roomTypeServicesRepo.fetchRoomCardData();
+
+        List<RoomCardDTO> result = new ArrayList<>();
+        for (Object[] row : rawData) {
+            String type = (String) row[0];
+            String star = (String) row[1];
+            Double price = (Double) row[2];
+            String serviceNames = (String) row[3];
+
+            String roomName = type + " - " + star + " sao";
+            List<String> services = serviceNames != null
+                    ? Arrays.asList(serviceNames.split(", "))
+                    : new ArrayList<>();
+
+            result.add(new RoomCardDTO(roomName, type, star, services, price));
+        }
+        return result;
     }
 }
