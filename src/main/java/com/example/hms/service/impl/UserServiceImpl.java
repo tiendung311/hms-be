@@ -1,12 +1,17 @@
 package com.example.hms.service.impl;
 
+import com.example.hms.config.ClerkConfig;
 import com.example.hms.entity.Users;
 import com.example.hms.model.UserManagementDTO;
 import com.example.hms.repository.UserRepo;
 import com.example.hms.service.UserService;
 import jakarta.transaction.Transactional;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +22,14 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private ClerkConfig clerkConfig;
+
+    private final WebClient webClient = WebClient.builder()
+            .baseUrl("https://api.clerk.com/v1")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
 
     @Override
     public void save(Users user) {
@@ -48,6 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void handleClerkWebhook(Map<String, Object> payload) {
+        System.out.println("🚀 Webhook received: " + payload);
         String eventType = (String) payload.get("type");
         Map<String, Object> data = (Map<String, Object>) payload.get("data");
 
@@ -69,6 +83,7 @@ public class UserServiceImpl implements UserService {
             user.setLastName(lastName);
             user.setEmail(email);
             user.setPassword(null);
+            user.setClerkUserId((String) data.get("id"));
 
             try {
                 save(user);
@@ -79,15 +94,34 @@ public class UserServiceImpl implements UserService {
         }
 
         if ("user.updated".equals(eventType)) {
-            Map<String, Object> publicMetadata = (Map<String, Object>) data.get("public_metadata");
-            String updatedRole = publicMetadata != null ? (String) publicMetadata.get("role") : null;
+            String updatedRole = null;
+            if (data.get("public_metadata") instanceof Map<?, ?> publicMetadata) {
+                updatedRole = (String) publicMetadata.get("role");
+            }
 
-            if (updatedRole != null) {
+            try {
+                updateUserInfoByEmail(email, firstName, lastName, email, updatedRole);
+                System.out.println("✅ User updated: " + email);
+            } catch (RuntimeException e) {
+                System.out.println("⚠️ User update failed: " + e.getMessage());
+            }
+        }
+
+        if ("user.deleted".equals(eventType)) {
+            String clerkUserId = (String) data.get("id");
+            if (clerkUserId != null) {
                 try {
-                    updateUserInfoByEmail(email, firstName, lastName, email, updatedRole);
-                    System.out.println("✅ User updated: " + email);
-                } catch (RuntimeException e) {
-                    System.out.println("⚠️ User update failed: " + e.getMessage());
+                    Users user = userRepo.findByClerkUserId(clerkUserId);
+                    if (user != null) {
+                        user.setDeleted(true);
+                        user.setUpdatedAt(LocalDateTime.now());
+                        userRepo.save(user);
+                        System.out.println("✅ User marked deleted in DB: " + user.getEmail());
+                    } else {
+                        System.out.println("⚠️ User not found in DB with Clerk ID: " + clerkUserId);
+                    }
+                } catch (Exception e) {
+                    System.out.println("⚠️ Error marking user as deleted: " + e.getMessage());
                 }
             }
         }
@@ -115,11 +149,54 @@ public class UserServiceImpl implements UserService {
             user.setDeleted(true);
             user.setUpdatedAt(LocalDateTime.now());
             userRepo.save(user);
+
+            deleteClerkUserByEmail(email);
         }
     }
 
     @Override
     public Users getCustomerByEmail(String email) {
         return userRepo.findByEmail(email);
+    }
+
+    private void deleteClerkUserByEmail(String email) {
+        // 1. Gọi API Clerk để tìm userId theo email
+        String clerkUserId = getClerkUserIdByEmail(email);
+        if (clerkUserId != null) {
+            // 2. Gọi DELETE /users/{userId}
+            try {
+                webClient.delete()
+                        .uri("/users/{userId}", clerkUserId)
+                        .header("Authorization", "Bearer " + clerkConfig.getSecretKey())
+                        .retrieve()
+                        .bodyToMono(Void.class)
+                        .block();
+                System.out.println("✅ Clerk user deleted: " + clerkUserId);
+            } catch (Exception e) {
+                System.out.println("⚠️ Failed to delete user in Clerk: " + e.getMessage());
+            }
+        }
+    }
+
+    private String getClerkUserIdByEmail(String email) {
+        try {
+            // GET /users?email_address=email@example.com
+            List<Map<String, Object>> response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/users")
+                            .queryParam("email_address", email)
+                            .build())
+                    .header("Authorization", "Bearer " + clerkConfig.getSecretKey())
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+                    .block();
+
+            if (response != null && !response.isEmpty()) {
+                return (String) response.get(0).get("id");
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Error fetching Clerk userId: " + e.getMessage());
+        }
+        return null;
     }
 }

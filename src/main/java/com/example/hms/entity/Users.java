@@ -26,6 +26,9 @@ public class Users {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    @Column(name = "clerk_user_id", unique = true)
+    private String clerkUserId;
+
     @OneToMany(mappedBy = "customer")
     private List<Bookings> bookings;
 }
