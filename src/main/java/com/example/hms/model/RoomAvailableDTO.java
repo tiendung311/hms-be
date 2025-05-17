@@ -14,4 +14,5 @@ public class RoomAvailableDTO {
     private String roomName;
     private List<String> services;
     private Double price;
+    private Integer roomTypeId;
 }

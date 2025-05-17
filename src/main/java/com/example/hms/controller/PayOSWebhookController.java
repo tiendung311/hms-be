@@ -2,14 +2,17 @@ package com.example.hms.controller;
 
 import com.example.hms.entity.Bookings;
 import com.example.hms.entity.Payments;
+import com.example.hms.model.PayOSLinkResDTO;
 import com.example.hms.model.PayOSWebhookPayload;
 import com.example.hms.repository.BookingRepo;
 import com.example.hms.repository.PaymentRepo;
+import com.example.hms.service.PayOSService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -22,6 +25,8 @@ public class PayOSWebhookController {
     private final BookingRepo bookingRepo;
 
     private final PaymentRepo paymentRepo;
+
+    private final PayOSService payOSService;
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhookRaw(@RequestBody String rawBody) {
@@ -89,5 +94,26 @@ public class PayOSWebhookController {
 
         paymentRepo.save(payment);
         bookingRepo.save(booking);
+    }
+
+    @PostMapping("/create-customer-link")
+    public ResponseEntity<PayOSLinkResDTO> createCustomerPayment(
+            @RequestParam String email,
+            @RequestParam Integer roomTypeId,
+            @RequestParam String checkIn,
+            @RequestParam String checkOut
+    ) {
+        try {
+            LocalDate checkInDate = LocalDate.parse(checkIn);
+            LocalDate checkOutDate = LocalDate.parse(checkOut);
+
+            System.out.println("data: " + email + ", " + roomTypeId + ", " + checkInDate + ", " + checkOutDate);
+
+            PayOSLinkResDTO res = payOSService.createCustomerPaymentLink(email, roomTypeId, checkInDate, checkOutDate);
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new PayOSLinkResDTO(null, "❌ " + e.getMessage()));
+        }
     }
 }

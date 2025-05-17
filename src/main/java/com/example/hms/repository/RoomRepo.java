@@ -45,4 +45,8 @@ public interface RoomRepo extends JpaRepository<Rooms, Integer> {
     """)
     List<String> findAvailableRoomNumbers(@Param("checkInDate") LocalDate checkInDate,
                                           @Param("checkOutDate") LocalDate checkOutDate);
+
+    @Query("SELECT r FROM Rooms r WHERE r.roomType.id = :roomTypeId AND r.roomNumber IN :availableRoomNumbers")
+    List<Rooms> findAvailableRoomByRoomType(@Param("roomTypeId") Integer roomTypeId,
+                                            @Param("availableRoomNumbers") List<String> availableRoomNumbers);
 }

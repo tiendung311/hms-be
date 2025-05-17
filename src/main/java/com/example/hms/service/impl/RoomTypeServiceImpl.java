@@ -49,7 +49,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
             Double price = (Double) row[2];
             List<String> services = roomTypeRepo.findServicesByRoomTypeId(roomTypeId);
 
-            result.add(new RoomAvailableDTO(roomName, services, price));
+            result.add(new RoomAvailableDTO(roomName, services, price, roomTypeId));
         }
 
         return result;
