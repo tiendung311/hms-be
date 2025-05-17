@@ -19,4 +19,6 @@ public interface UserService {
     void deleteUserByEmail(String email);
 
     Users getCustomerByEmail(String email);
+
+    Integer getTotalActiveUsers();
 }

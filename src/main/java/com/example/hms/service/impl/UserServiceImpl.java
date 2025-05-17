@@ -199,4 +199,9 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    @Override
+    public Integer getTotalActiveUsers() {
+        return userRepo.getTotalActiveUsers();
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,4 +61,20 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
     Optional<Payments> findFirstByBooking_IdAndPaymentStatus(Integer bookingId, String status);
 
     Optional<Payments> findByOrderCode(Long orderCode);
+
+    @Query(value = "SELECT SUM(amount) FROM payments WHERE payment_status = :status", nativeQuery = true)
+    BigDecimal findTotalAmountByStatus(String status);
+
+    @Query(value = """
+    SELECT SUM(p.amount)
+    FROM payments p
+    WHERE p.payment_status = :status
+      AND MONTH(p.payment_date) = :month
+      AND YEAR(p.payment_date) = :year
+    """, nativeQuery = true)
+    BigDecimal findTotalAmountByMonth(
+            @Param("status") String status,
+            @Param("month") int month,
+            @Param("year") int year
+    );
 }

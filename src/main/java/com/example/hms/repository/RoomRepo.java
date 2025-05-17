@@ -49,4 +49,7 @@ public interface RoomRepo extends JpaRepository<Rooms, Integer> {
     @Query("SELECT r FROM Rooms r WHERE r.roomType.id = :roomTypeId AND r.roomNumber IN :availableRoomNumbers")
     List<Rooms> findAvailableRoomByRoomType(@Param("roomTypeId") Integer roomTypeId,
                                             @Param("availableRoomNumbers") List<String> availableRoomNumbers);
+
+    @Query("SELECT COUNT(r) FROM Rooms r")
+    Integer countAllRoom();
 }

@@ -22,4 +22,7 @@ public interface UserRepo extends JpaRepository<Users, Integer> {
     List<Users> fetchCustomerManagementData();
 
     Users findByClerkUserId(String clerkUserId);
+
+    @Query("SELECT COUNT(u) FROM Users u WHERE u.isDeleted = false")
+    Integer getTotalActiveUsers();
 }

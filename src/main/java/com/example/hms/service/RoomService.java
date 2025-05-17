@@ -17,4 +17,6 @@ public interface RoomService {
     String getRoomTypeByRoomNumber(String roomNumber);
 
     List<String> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate);
+
+    Integer countAllRoom();
 }

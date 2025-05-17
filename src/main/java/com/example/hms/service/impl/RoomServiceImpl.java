@@ -79,4 +79,9 @@ public class RoomServiceImpl implements RoomService {
     public List<String> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         return roomRepo.findAvailableRoomNumbers(checkInDate, checkOutDate);
     }
+
+    @Override
+    public Integer countAllRoom() {
+        return roomRepo.countAllRoom();
+    }
 }
