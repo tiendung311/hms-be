@@ -1,9 +1,6 @@
 package com.example.hms.controller;
 
-import com.example.hms.model.BookingCreateDTO;
-import com.example.hms.model.BookingManagementDTO;
-import com.example.hms.model.BookingReqDTO;
-import com.example.hms.model.BookingResDTO;
+import com.example.hms.model.*;
 import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,5 +67,10 @@ public class BookingController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tạo booking");
         }
+    }
+
+    @GetMapping("/bookings/customer")
+    public ResponseEntity<List<BookingByUserDTO>> getBookingsByUserEmail(@RequestParam String email) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserEmail(email));
     }
 }

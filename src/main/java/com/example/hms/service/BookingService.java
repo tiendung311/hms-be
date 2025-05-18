@@ -1,9 +1,6 @@
 package com.example.hms.service;
 
-import com.example.hms.model.BookingCreateDTO;
-import com.example.hms.model.BookingManagementDTO;
-import com.example.hms.model.BookingReqDTO;
-import com.example.hms.model.BookingResDTO;
+import com.example.hms.model.*;
 
 import java.util.List;
 
@@ -19,4 +16,6 @@ public interface BookingService {
     double calculateTotalAmount(String roomNumber, String checkInDateStr, String checkOutDateStr);
 
     void createBooking(BookingCreateDTO bookingCreateDTO);
+
+    List<BookingByUserDTO> getBookingsByUserEmail(String email);
 }

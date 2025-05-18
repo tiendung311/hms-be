@@ -1,10 +1,7 @@
 package com.example.hms.service.impl;
 
 import com.example.hms.entity.*;
-import com.example.hms.model.BookingCreateDTO;
-import com.example.hms.model.BookingManagementDTO;
-import com.example.hms.model.BookingReqDTO;
-import com.example.hms.model.BookingResDTO;
+import com.example.hms.model.*;
 import com.example.hms.repository.BookingRepo;
 import com.example.hms.repository.PaymentRepo;
 import com.example.hms.repository.RoomRepo;
@@ -210,5 +207,39 @@ public class BookingServiceImpl implements BookingService {
         payment.setCreatedAt(LocalDateTime.now());
 
         paymentRepo.save(payment);
+    }
+
+    @Override
+    public List<BookingByUserDTO> getBookingsByUserEmail(String email) {
+        List<Bookings> bookings = bookingRepo.findBookingsByCustomerEmail(email);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        List<BookingByUserDTO> result = new ArrayList<>();
+
+        for (Bookings b : bookings) {
+            Rooms room = b.getRoom();
+            RoomTypes roomType = room.getRoomType();
+
+            // Lấy tên services từ roomTypeServices
+            List<String> serviceNames = roomType.getRoomTypeServices()
+                    .stream()
+                    .map(rts -> rts.getService().getServiceName())
+                    .toList();
+
+            String roomTypeStr = "Phòng " + roomType.getType() + " - " + roomType.getStar() + " sao";
+
+            BookingByUserDTO dto = new BookingByUserDTO();
+            dto.setBookingId(b.getId());
+            dto.setRoomNumber(room.getRoomNumber());
+            dto.setRoomType(roomTypeStr);
+            dto.setServices(serviceNames);
+            dto.setCheckInDate(b.getCheckInDate().format(formatter));
+            dto.setCheckOutDate(b.getCheckOutDate().format(formatter));
+            dto.setBookingStatus(b.getStatus());
+            dto.setPrice(b.getTotalAmount());
+
+            result.add(dto);
+        }
+        return result;
     }
 }
