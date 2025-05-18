@@ -1,6 +1,7 @@
 package com.example.hms.controller;
 
 import com.example.hms.model.RoomManagementDTO;
+import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,9 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
     @GetMapping("/rooms/status")
     public List<String> getAllRoomStatuses() {
         return roomService.getAllRoomStatuses();
@@ -34,6 +38,7 @@ public class RoomController {
     public ResponseEntity<String> toggleRoomMaintenance(@PathVariable String roomNumber) {
         try {
             roomService.toggleRoomMaintenance(roomNumber);
+            activityLogService.log("Đã cập nhật trạng thái phòng " + roomNumber);
             return ResponseEntity.ok("Toggle status successfully.");
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

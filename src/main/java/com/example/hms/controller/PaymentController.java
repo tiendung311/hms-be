@@ -3,6 +3,7 @@ package com.example.hms.controller;
 import com.example.hms.model.PaymentManagementDTO;
 import com.example.hms.model.PaymentReqDTO;
 import com.example.hms.model.PaymentResDTO;
+import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.PayOSService;
 import com.example.hms.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class PaymentController {
 
     @Autowired
     private PayOSService payOSService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/payments/status")
     public List<String> getAllPaymentStatuses() {
@@ -45,6 +49,7 @@ public class PaymentController {
     public ResponseEntity<Void> updatePaymentDetail(@PathVariable("transactionId") Integer transactionId,
                                                     @RequestBody PaymentReqDTO dto) {
         paymentService.updatePaymentDetail(transactionId, dto);
+        activityLogService.log("Cập nhật thông tin thanh toán với transactionId: " + transactionId);
         return ResponseEntity.noContent().build();
     }
 

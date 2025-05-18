@@ -4,6 +4,7 @@ import com.example.hms.model.BookingCreateDTO;
 import com.example.hms.model.BookingManagementDTO;
 import com.example.hms.model.BookingReqDTO;
 import com.example.hms.model.BookingResDTO;
+import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,9 @@ import java.util.Map;
 public class BookingController {
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/bookings/status")
     public List<String> getAllBookingStatuses() {
@@ -39,6 +43,7 @@ public class BookingController {
     public ResponseEntity<?> updateBooking(@PathVariable int bookingId,
                                            @RequestBody BookingReqDTO bookingReqDTO) {
         bookingService.updateBookingDetail(bookingId, bookingReqDTO);
+        activityLogService.log("Cập nhật booking với ID: " + bookingId);
         return ResponseEntity.ok("Booking updated successfully");
     }
 
@@ -54,6 +59,7 @@ public class BookingController {
     public ResponseEntity<?> createBooking(@RequestBody BookingCreateDTO bookingCreateDTO) {
         try {
             bookingService.createBooking(bookingCreateDTO);
+            activityLogService.log("Tạo booking mới với phòng: " + bookingCreateDTO.getRoomNumber());
             return ResponseEntity.status(HttpStatus.CREATED).body("Tạo booking thành công!");
         } catch (IllegalStateException e) {
             e.printStackTrace();

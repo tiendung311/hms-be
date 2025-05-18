@@ -4,6 +4,7 @@ import com.example.hms.model.RoomCardDTO;
 import com.example.hms.model.RoomTypeServiceReqDTO;
 import com.example.hms.model.RoomTypeServiceResDTO;
 import com.example.hms.model.ServiceManagementDTO;
+import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.RoomTypeServicesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ import java.util.List;
 public class RoomTypeServicesController {
     @Autowired
     private RoomTypeServicesService roomTypeServicesService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/admin/room-type-services")
     public ResponseEntity<List<ServiceManagementDTO>> getServiceManagementList() {
@@ -39,6 +43,7 @@ public class RoomTypeServicesController {
     ) {
         try {
             roomTypeServicesService.updateRoomTypeServices(id, request);
+            activityLogService.log("Cập nhật dịch vụ với ID: " + id);
             return ResponseEntity.ok("Cập nhật thành công");
         } catch (Exception e) {
             e.printStackTrace();

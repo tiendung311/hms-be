@@ -1,5 +1,6 @@
 package com.example.hms.controller;
 
+import com.example.hms.service.ActivityLogService;
 import com.example.hms.service.PaymentService;
 import com.example.hms.service.RoomService;
 import com.example.hms.service.UserService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -22,6 +24,9 @@ public class AdminHomeController {
 
     @Autowired
     private RoomService roomService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     @GetMapping("/total-amount/success")
     public BigDecimal getTotalAmountByStatus() {
@@ -48,5 +53,10 @@ public class AdminHomeController {
     @GetMapping("/total-rooms")
     private Integer getTotalRooms() {
         return roomService.countAllRoom();
+    }
+
+    @GetMapping("/activity-log")
+    public List<String> getActivityLog() {
+        return activityLogService.getRecentActivities();
     }
 }
