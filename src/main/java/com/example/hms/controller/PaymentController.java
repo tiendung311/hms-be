@@ -66,4 +66,15 @@ public class PaymentController {
             return ResponseEntity.status(500).body("Tạo liên kết thanh toán thất bại: " + e.getMessage());
         }
     }
+
+    @PostMapping("/admin/payments/{paymentId}/refund")
+    public ResponseEntity<String> refundPayment(@PathVariable("paymentId") Integer paymentId) {
+        try {
+            paymentService.refundPayment(paymentId);
+            activityLogService.log("Hoàn tiền cho giao dịch: " + paymentId);
+            return ResponseEntity.ok("Hoàn tiền thành công");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body("Hoàn tiền thất bại: " + e.getMessage());
+        }
+    }
 }

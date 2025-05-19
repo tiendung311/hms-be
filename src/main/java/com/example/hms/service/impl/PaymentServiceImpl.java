@@ -1,9 +1,11 @@
 package com.example.hms.service.impl;
 
+import com.example.hms.entity.Bookings;
 import com.example.hms.entity.Payments;
 import com.example.hms.model.PaymentManagementDTO;
 import com.example.hms.model.PaymentReqDTO;
 import com.example.hms.model.PaymentResDTO;
+import com.example.hms.repository.BookingRepo;
 import com.example.hms.repository.PaymentRepo;
 import com.example.hms.service.PaymentService;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,9 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentRepo paymentRepo;
+
+    @Autowired
+    private BookingRepo bookingRepo;
 
     @Override
     public List<String> getAllPaymentStatuses() {
@@ -127,5 +132,31 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public BigDecimal getTotalAmountByMonth(String status, int month, int year) {
         return paymentRepo.findTotalAmountByMonth(status, month, year);
+    }
+
+    @Override
+    @Transactional
+    public void refundPayment(Integer paymentId) {
+        Payments payment = paymentRepo.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán với ID: " + paymentId));
+
+        if (!"Thành công".equals(payment.getPaymentStatus())) {
+            throw new RuntimeException("Chỉ hoàn tiền các giao dịch có trạng thái 'Thành công'");
+        }
+
+        Bookings booking = payment.getBooking();
+        if (booking == null) {
+            throw new RuntimeException("Không tìm thấy booking tương ứng với thanh toán");
+        }
+
+        // Cập nhật trạng thái
+        payment.setPaymentStatus("Hoàn tiền");
+        payment.setPaymentDate(LocalDateTime.now());
+
+        booking.setStatus("Hủy");
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        paymentRepo.save(payment);
+        bookingRepo.save(booking);
     }
 }

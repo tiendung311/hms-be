@@ -23,4 +23,6 @@ public interface PaymentService {
     BigDecimal getTotalAmountByStatus(String status);
 
     BigDecimal getTotalAmountByMonth(String status, int month, int year);
+
+    void refundPayment(Integer paymentId);
 }
