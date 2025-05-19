@@ -25,7 +25,7 @@ public interface BookingRepo extends JpaRepository<Bookings, Integer> {
     FROM bookings b
     JOIN users u ON b.customer_id = u.id
     JOIN rooms r ON b.room_id = r.id
-    ORDER BY b.check_in_date DESC
+    ORDER BY b.created_at DESC
     """, nativeQuery = true)
     List<Object[]> fetchBookingManagementData();
 

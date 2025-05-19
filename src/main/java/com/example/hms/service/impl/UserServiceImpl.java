@@ -83,10 +83,12 @@ public class UserServiceImpl implements UserService {
             user.setLastName(lastName);
             user.setEmail(email);
             user.setPassword(null);
-            user.setClerkUserId((String) data.get("id"));
+            String clerkUserId = (String) data.get("id");
+            user.setClerkUserId(clerkUserId);
 
             try {
                 save(user);
+                setClerkUserRole(clerkUserId, "user"); // 👈 Set role trong metadata Clerk
                 System.out.println("✅ User created: " + email);
             } catch (RuntimeException e) {
                 System.out.println("⚠️ User already exists: " + e.getMessage());
@@ -124,6 +126,24 @@ public class UserServiceImpl implements UserService {
                     System.out.println("⚠️ Error marking user as deleted: " + e.getMessage());
                 }
             }
+        }
+    }
+
+    private void setClerkUserRole(String clerkUserId, String role) {
+        Map<String, Object> metadata = Map.of("role", role);
+        Map<String, Object> body = Map.of("public_metadata", metadata);
+
+        try {
+            webClient.patch()
+                    .uri("/users/{userId}", clerkUserId)
+                    .header("Authorization", "Bearer " + clerkConfig.getSecretKey())
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
+            System.out.println("✅ Clerk public_metadata set: role=" + role);
+        } catch (Exception e) {
+            System.out.println("⚠️ Failed to set public_metadata: " + e.getMessage());
         }
     }
 
