@@ -1,6 +1,7 @@
 package com.example.hms.repository;
 
 import com.example.hms.entity.RoomTypes;
+import com.example.hms.model.RoomTypeCountDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -48,4 +49,16 @@ public interface RoomTypeRepo extends JpaRepository<RoomTypes, Integer> {
 
     @Query("SELECT MAX(rt.pricePerNight) FROM RoomTypes rt")
     Double findMaxPrice();
+
+    @Query("""
+    SELECT new com.example.hms.model.RoomTypeCountDTO(
+        rt.id,
+        CONCAT('Phòng ', rt.type, ' - ', rt.star, ' sao'),
+        COUNT(r)
+    )
+    FROM RoomTypes rt
+    LEFT JOIN rt.rooms r
+    GROUP BY rt.id, rt.type, rt.star
+    """)
+    List<RoomTypeCountDTO> countRoomsByRoomType();
 }

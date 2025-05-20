@@ -1,6 +1,7 @@
 package com.example.hms.service.impl;
 
 import com.example.hms.model.RoomAvailableDTO;
+import com.example.hms.model.RoomTypeCountDTO;
 import com.example.hms.repository.RoomTypeRepo;
 import com.example.hms.service.RoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +64,10 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     @Override
     public Double findMaxPrice() {
         return roomTypeRepo.findMaxPrice();
+    }
+
+    @Override
+    public List<RoomTypeCountDTO> countRoomsByRoomType() {
+        return roomTypeRepo.countRoomsByRoomType();
     }
 }

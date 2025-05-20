@@ -62,4 +62,6 @@ public interface BookingRepo extends JpaRepository<Bookings, Integer> {
     AND b.customer.isDeleted = false
     """)
     List<Bookings> findBookingsByCustomerEmail(@Param("email") String email);
+
+    List<Bookings> findAllByStatusAndCheckInDate(String status, LocalDate checkInDate);
 }

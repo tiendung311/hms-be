@@ -1,6 +1,7 @@
 package com.example.hms.service;
 
 import com.example.hms.model.RoomAvailableDTO;
+import com.example.hms.model.RoomTypeCountDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,4 +16,6 @@ public interface RoomTypeService {
     Double findMinPrice();
 
     Double findMaxPrice();
+
+    List<RoomTypeCountDTO> countRoomsByRoomType();
 }

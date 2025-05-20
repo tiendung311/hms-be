@@ -2,8 +2,10 @@ package com.example.hms.service.impl;
 
 import com.example.hms.entity.Bookings;
 import com.example.hms.entity.Rooms;
+import com.example.hms.entity.Users;
 import com.example.hms.repository.BookingRepo;
 import com.example.hms.repository.RoomRepo;
+import com.example.hms.service.MailService;
 import com.example.hms.service.SchedulerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +24,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final BookingRepo bookingRepo;
 
     private final RoomRepo roomRepo;
+
+    private final MailService mailService;
 
     // Chạy mỗi phút (test)
     //@Scheduled(cron = "0 * * * * *")
@@ -60,6 +64,27 @@ public class SchedulerServiceImpl implements SchedulerService {
 
             roomRepo.save(room);
             updatedRoomIds.add(room.getId());
+        }
+    }
+
+    @Scheduled(cron = "0 0 */12 * * *")
+    public void sendCheckInReminders() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        List<Bookings> bookings = bookingRepo.findAllByStatusAndCheckInDate("Xác nhận", tomorrow);
+
+        System.out.println("Found " + bookings.size() + " bookings for tomorrow check-in");
+
+        for (Bookings booking : bookings) {
+            Users customer = booking.getCustomer();
+            if (customer.getEmail() != null) {
+                mailService.sendBookingReminder(
+                        customer.getEmail(),
+                        customer.getFirstName() + " " + customer.getLastName(),
+                        booking.getRoom().getRoomNumber(),
+                        booking.getCheckInDate().toString()
+                );
+            }
         }
     }
 }

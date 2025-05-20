@@ -2,6 +2,7 @@ package com.example.hms.controller;
 
 import com.example.hms.model.RoomAvailableDTO;
 import com.example.hms.model.RoomSearchReqDTO;
+import com.example.hms.model.RoomTypeCountDTO;
 import com.example.hms.service.RoomTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,5 +42,10 @@ public class RoomTypeController {
     @GetMapping("/room/max-price")
     public Double findMaxPrice() {
         return roomTypeService.findMaxPrice();
+    }
+
+    @GetMapping("/room-types/count")
+    public List<RoomTypeCountDTO> countRoomsByRoomType() {
+        return roomTypeService.countRoomsByRoomType();
     }
 }
