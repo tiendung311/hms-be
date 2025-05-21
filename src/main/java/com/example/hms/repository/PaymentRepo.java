@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,4 +79,18 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
             @Param("month") int month,
             @Param("year") int year
     );
+
+    Payments findByBookingId(Integer bookingId);
+
+    @Query("SELECT MIN(p.paymentDate) FROM Payments p")
+    LocalDate findMinPaymentDate();
+
+    @Query("SELECT MAX(p.paymentDate) FROM Payments p")
+    LocalDate findMaxPaymentDate();
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payments p WHERE p.paymentStatus = :status " +
+            "AND p.paymentDate BETWEEN :from AND :to")
+    BigDecimal findTotalAmountByPaymentStatusAndDateBetween(@Param("status") String status,
+                                                            @Param("from") LocalDateTime from,
+                                                            @Param("to") LocalDateTime to);
 }

@@ -2,6 +2,7 @@ package com.example.hms.service.impl;
 
 import com.example.hms.entity.Bookings;
 import com.example.hms.entity.Payments;
+import com.example.hms.model.MonthlyNetRevenueDTO;
 import com.example.hms.model.PaymentManagementDTO;
 import com.example.hms.model.PaymentReqDTO;
 import com.example.hms.model.PaymentResDTO;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,5 +161,51 @@ public class PaymentServiceImpl implements PaymentService {
 
         paymentRepo.save(payment);
         bookingRepo.save(booking);
+    }
+
+    @Override
+    public BigDecimal getTotalIncome(LocalDateTime from, LocalDateTime to) {
+        return paymentRepo.findTotalAmountByPaymentStatusAndDateBetween("Thành công", from, to);
+    }
+
+    @Override
+    public BigDecimal getTotalRefund(LocalDateTime from, LocalDateTime to) {
+        return paymentRepo.findTotalAmountByPaymentStatusAndDateBetween("Hoàn tiền", from, to);
+    }
+
+    @Override
+    public BigDecimal getNetRevenue(LocalDateTime from, LocalDateTime to) {
+        BigDecimal income = getTotalIncome(from, to);
+        BigDecimal refund = getTotalRefund(from, to);
+        return income.subtract(refund);
+    }
+
+    @Override
+    public List<MonthlyNetRevenueDTO> getMonthlyNetRevenue(LocalDate from, LocalDate to) {
+        List<MonthlyNetRevenueDTO> result = new ArrayList<>();
+
+        YearMonth start = YearMonth.from(from);
+        YearMonth end = YearMonth.from(to);
+
+        while (!start.isAfter(end)) {
+            int year = start.getYear();
+            int month = start.getMonthValue();
+
+            // Doanh thu thành công
+            BigDecimal income = paymentRepo.findTotalAmountByMonth("Thành công", month, year);
+            if (income == null) income = BigDecimal.ZERO;
+
+            // Hoàn tiền
+            BigDecimal refund = paymentRepo.findTotalAmountByMonth("Hoàn tiền", month, year);
+            if (refund == null) refund = BigDecimal.ZERO;
+
+            BigDecimal netRevenue = income.subtract(refund);
+
+            result.add(new MonthlyNetRevenueDTO(start.toString(), netRevenue));
+
+            start = start.plusMonths(1);
+        }
+
+        return result;
     }
 }

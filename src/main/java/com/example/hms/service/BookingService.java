@@ -18,4 +18,6 @@ public interface BookingService {
     void createBooking(BookingCreateDTO bookingCreateDTO);
 
     List<BookingByUserDTO> getBookingsByUserEmail(String email);
+
+    void cancelBooking(int bookingId);
 }

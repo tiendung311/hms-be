@@ -7,6 +7,7 @@ import com.example.hms.repository.PaymentRepo;
 import com.example.hms.repository.RoomRepo;
 import com.example.hms.repository.UserRepo;
 import com.example.hms.service.BookingService;
+import com.example.hms.service.MailService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private PaymentRepo paymentRepo;
+
+    @Autowired
+    private MailService mailService;
 
     @Override
     public List<String> getAllBookingStatuses() {
@@ -241,5 +245,48 @@ public class BookingServiceImpl implements BookingService {
             result.add(dto);
         }
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void cancelBooking(int bookingId) {
+        Bookings booking = bookingRepo.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy booking với ID: " + bookingId));
+
+        LocalDate today = LocalDate.now();
+        LocalDate checkInDate = booking.getCheckInDate();
+        long daysBetween = ChronoUnit.DAYS.between(today, checkInDate);
+
+        if (daysBetween < 2) {
+            throw new IllegalStateException("Vui lòng đến trực tiếp khách sạn để hủy do quá gần ngày nhận phòng.");
+        }
+
+        String status = booking.getStatus();
+        if (!status.equalsIgnoreCase("Chờ") && !status.equalsIgnoreCase("Xác nhận")) {
+            throw new IllegalStateException("Chỉ có thể hủy các booking ở trạng thái Chờ hoặc Xác nhận.");
+        }
+
+        booking.setStatus("Hủy");
+        booking.setUpdatedAt(LocalDateTime.now());
+        bookingRepo.save(booking);
+
+        Rooms room = booking.getRoom();
+
+        Payments payments = paymentRepo.findByBookingId(bookingId);
+        if (payments != null) {
+            if (payments.getPaymentStatus().equalsIgnoreCase("Chờ")) {
+                payments.setPaymentStatus("Hủy");
+            } else {
+                payments.setPaymentStatus("Hoàn tiền");
+            }
+            payments.setPaymentDate(LocalDateTime.now());
+            paymentRepo.save(payments);
+        }
+
+        // Gửi mail
+        Users customer = booking.getCustomer();
+        String fullName = customer.getFirstName() + " " + customer.getLastName();
+        String checkInStr = checkInDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        mailService.sendCancellationEmail(customer.getEmail(), fullName, room.getRoomNumber(), checkInStr);
     }
 }

@@ -73,4 +73,18 @@ public class BookingController {
     public ResponseEntity<List<BookingByUserDTO>> getBookingsByUserEmail(@RequestParam String email) {
         return ResponseEntity.ok(bookingService.getBookingsByUserEmail(email));
     }
+
+    @PutMapping("/bookings/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable int bookingId) {
+        try {
+            bookingService.cancelBooking(bookingId);
+            return ResponseEntity.ok("Hủy phòng thành công! Vui lòng kiểm tra email.");
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi khi hủy booking.");
+        }
+    }
 }
