@@ -1,9 +1,11 @@
 package com.example.hms.service.impl;
 
 import com.example.hms.entity.Bookings;
+import com.example.hms.entity.Payments;
 import com.example.hms.entity.Rooms;
 import com.example.hms.entity.Users;
 import com.example.hms.repository.BookingRepo;
+import com.example.hms.repository.PaymentRepo;
 import com.example.hms.repository.RoomRepo;
 import com.example.hms.service.MailService;
 import com.example.hms.service.SchedulerService;
@@ -26,6 +28,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     private final RoomRepo roomRepo;
 
     private final MailService mailService;
+
+    private final PaymentRepo paymentRepo;
 
     // Chạy mỗi phút (test)
     //@Scheduled(cron = "0 * * * * *")
@@ -85,6 +89,28 @@ public class SchedulerServiceImpl implements SchedulerService {
                         booking.getCheckInDate().toString()
                 );
             }
+        }
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    public void cancelExpiredPendingPayments() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiredTime = now.minusMinutes(20);
+
+        // Lấy tất cả payment có trạng thái "Chờ" và createdAt trước thời điểm 20 phút trước
+        List<Payments> pendingPayments = paymentRepo.findAllByPaymentStatusAndCreatedAtBefore("Chờ", expiredTime);
+
+        for (Payments payment : pendingPayments) {
+            payment.setPaymentStatus("Hết hạn");
+
+            Bookings booking = payment.getBooking();
+            booking.setStatus("Hủy");
+            booking.setUpdatedAt(now);
+
+            bookingRepo.save(booking);
+            paymentRepo.save(payment);
+
+            System.out.println("Hủy booking ID " + booking.getId() + " vì quá thời gian thanh toán");
         }
     }
 }

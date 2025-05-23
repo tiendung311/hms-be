@@ -93,4 +93,10 @@ public interface PaymentRepo extends JpaRepository<Payments, Integer> {
     BigDecimal findTotalAmountByPaymentStatusAndDateBetween(@Param("status") String status,
                                                             @Param("from") LocalDateTime from,
                                                             @Param("to") LocalDateTime to);
+
+    @Query("SELECT p FROM Payments p WHERE p.paymentStatus = :status AND p.createdAt < :time")
+    List<Payments> findAllByPaymentStatusAndCreatedAtBefore(
+            @Param("status") String status,
+            @Param("time") LocalDateTime time
+    );
 }
