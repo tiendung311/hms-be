@@ -165,7 +165,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public BigDecimal getTotalIncome(LocalDateTime from, LocalDateTime to) {
-        return paymentRepo.findTotalAmountByPaymentStatusAndDateBetween("Thành công", from, to);
+        return paymentRepo.findTotalAmountByPaymentStatusAndDateBetween("Thành công", from, to)
+                .add(paymentRepo.findTotalAmountByPaymentStatusAndDateBetween("Hoan tiền", from, to));
     }
 
     @Override
@@ -199,7 +200,8 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal refund = paymentRepo.findTotalAmountByMonth("Hoàn tiền", month, year);
             if (refund == null) refund = BigDecimal.ZERO;
 
-            BigDecimal netRevenue = income.subtract(refund);
+//            BigDecimal netRevenue = income.subtract(refund);
+            BigDecimal netRevenue = income;
 
             result.add(new MonthlyNetRevenueDTO(start.toString(), netRevenue));
 

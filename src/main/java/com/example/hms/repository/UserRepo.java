@@ -23,6 +23,6 @@ public interface UserRepo extends JpaRepository<Users, Integer> {
 
     Users findByClerkUserId(String clerkUserId);
 
-    @Query("SELECT COUNT(u) FROM Users u WHERE u.isDeleted = false")
+    @Query("SELECT COUNT(u) FROM Users u WHERE u.isDeleted = false AND u.role = 'user'")
     Integer getTotalActiveUsers();
 }
